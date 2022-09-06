@@ -61,4 +61,4 @@ io.on('connection', socket=>{
     })
     console.log("socket conectado: ",socket.id);
 })
-server.listen(3000,console.log('aberto no localhost 3000'));
+server.listen(process.env.PORT||3000,console.log('aberto no localhost 3000'));
