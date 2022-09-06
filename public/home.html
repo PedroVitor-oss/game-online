@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js" integrity="sha512-MgkNs0gNdrnOM7k+0L+wgiRc5aLgl74sJQKbIWegVIMvVGPc1+gc1L2oK9Wf/D9pq58eqIJAxOonYPVE5UwUFA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js" integrity="sha512-rCZdHNB0AePry6kAnKAVFMRfWPmUXSo+/vlGtrOUvhsxD0Punm/xWbEh+8vppPIOzKB9xnk42yCRZ5MD/jvvjQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  
+<script>
+    let socket = io(window.location.href);
+    let jogadores = [];
+    let per = {
+        x:0,
+        y:0
+    }
+    socket.on("carregarJogadore",date=>{
+        jogadores = date;
+    })
+    socket.on('newPosi',posi=>{
+        
+        per = posi;
+        console.log("nova posição recebida",per)
+    })
+    //let layout = {x:-10,y:-10};
+    let imgbase;
+    let sprites = [
+        {x:16,y:16,l:85,a:122},//d
+        {x:16,y:155,l:85,a:122},//u
+        {x:16,y:285,l:85,a:122},//l
+        {x:16,y:430,l:85,a:122},//d
+    ]
+    function setup(){
+        createCanvas(windowWidth,windowHeight-5);
+        imgbase = loadImage("/img/perBase.png");
+    }
+    
+    function draw(){
+        background("#5f0");
+       
+        for(p of jogadores){
+            if(p.id == socket.id){
+                fill('#ff0f');
+               // rect(width/2,height/2,20)
+            }else{
+                fill("#bbb")
+                
+            }
+            sprite = sprites[p.direcao];
+            image(imgbase,p.position.x,p.position.y,20,30,
+            sprite.x,sprite.y,sprite.l,sprite.a);
+            //rect(p.position.x,p.position.y,20)
+             
+        }
+    
+        socket.emit("atualizar")
+    }
+    function keyPressed(){
+        if(keyIsDown(UP_ARROW)){
+            socket.emit("movUp");
+            
+        }
+        if(keyIsDown(DOWN_ARROW)){
+            socket.emit("movDOWN")
+        }
+        if(keyIsDown(LEFT_ARROW)){
+            socket.emit("movLEFT")
+        }
+        if(keyIsDown(RIGHT_ARROW)){
+            socket.emit("movRIGHT")
+        }
+    }
+</script>
+</body>
+</html>
